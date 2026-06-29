@@ -1,0 +1,28 @@
+# Runs the two things Order Service needs: a PostgreSQL database + RabbitMQ.
+# Start with:  docker compose up -d
+# Stop with:   docker compose down
+services:
+  order-db:
+    image: postgres:16
+    container_name: order-db
+    environment:
+      POSTGRES_DB: order_db
+      POSTGRES_USER: order_user
+      POSTGRES_PASSWORD: order_pass
+    ports:
+      - "5434:5432"                 # host 5434 -> container 5432 (5433 is used by product-db)
+    volumes:
+      - order-db-data:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:3-management    # "-management" gives a web dashboard
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"                 # the messaging port (your app connects here)
+      - "15672:15672"               # the web dashboard: http://localhost:15672 (guest/guest)
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+volumes:
+  order-db-data:
